@@ -1,0 +1,92 @@
+#四、Geth客户端的一些命令
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首先在上一篇中我们提到，可以用下面的命令来建立一个新的私有链，现在来对其做一些解释：<br/>
+	geth --datadir "./" --nodiscover console 2>>geth.log
+	
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此次搭建以太坊私链的环境为 Ubuntu 16.04.4，CentOS 上大体相同，需要注意的注意的一点是，由于区块链生态中的相关软件都较新，所以这里推荐操作系统方面也尽可能使用较新的稳定版本。
+##1、安装以太坊客户端
+	sudo add-apt-repository -y ppa:ethereum/ethereum
+	sudo apt-get update
+	sudo apt-get install -y ethereum
+	geth version
+##2、建立目录和 genesis.json 文件
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在命令行模式新建一个目录，例如 .ethereum，进入该目录并创建文件 genesis.json，并填入如下内容。
+	
+	{
+	  "nonce": "0x0000000000000042",
+	  "timestamp": "0x0",
+	  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+	  "extraData": "0x00",
+	  "gasLimit": "0x80000000",
+	  "difficulty": "0x1",
+	  "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+	  "coinbase": "0x3333333333333333333333333333333333333333",
+	  "alloc": {     },
+	  "config": {     }
+	}
+
+##3、执行命令，创建创世区块
+	geth --datadir "./" init genesis.json
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这时应注意一下，当前目录下会新增出两个文件夹 geth 和 keystore。
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geth 中保存的是区块链的相关数据。
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keystore 中保存的是该链条中的用户信息。
+##4、创建自己的私有链条
+	geth --datadir "./" console 2>>geth.log
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注意：>> 的前后不能有空格。<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;命令成功执行后应如下图所示：
+
+![创建私有链条][create-private-chain]
+
+##5、在自己的私链上创建用户
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输入命令 eth.accounts，会发现返回值为 []，这是因为此时虽然已经创建了以太坊私链，但还没有任何账户。
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输入命令 personal.newAccount("xxx")，该命令将创建一个新的用户，该用户的密码是 xxx，其之后在以太坊钱包中的名称将按顺序显示为 account 1, account 2 等，用户也可以将 xxx，改为 123 或者 123456，或者任意密码。
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;再次输入命令 eth.accounts，会发现一个新的用户被创建了出来，重复 personal.newAccount() & eth.accounts 可以创建若干账户出来。
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;命令成功执行的情况如下图所示：
+
+![在私链上创建用户][create-user-on-private-net]
+
+##6、打印区块链日志
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;重新打开一个命令行，执行：
+
+```
+cd .ethereum/ & tail -Fn 500 geth.log
+```
+##7、开始挖矿
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;回到之前的命令行窗口，执行命令 ```miner.start(1)```
+![开发挖矿][begin-mine]
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;稍等片刻后便会开始挖矿，一些成功挖矿的日志如下：
+
+![一些挖矿日志][has-mined]
+
+##注意点
+1. 挖矿挖到的 ether币会默认保在第一个账户中，即 eth.acccounts[0] 中。
+2. 挖矿是执行智能合约的基础。如果停止挖矿，不仅以太币会停止生成，所有智能合约的调用也会不起作用。
+3. 如果真的要停止，可以执行命令 miner.stop() 来停止挖矿
+4. 按上面的命令，应该是可以实现以太坊挖矿的。如果不行的话，可能是之前有存在的链，此时可删除之前的数据。在 Linux 下即删除 ~/.ethash 文件夹和里面的文件即可。
+
+##8、查看主账户以太币数量
+	acc0 = eth.accounts[0]
+	eth.getBalance(acc0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结果只要不为 0，就说明挖矿成功。
+
