@@ -1,92 +1,150 @@
 #四、Geth客户端的一些命令
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首先在上一篇中我们提到，可以用下面的命令来建立一个新的私有链，现在来对其做一些解释：<br/>
-	geth --datadir "./" --nodiscover console 2>>geth.log
-	
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此次搭建以太坊私链的环境为 Ubuntu 16.04.4，CentOS 上大体相同，需要注意的注意的一点是，由于区块链生态中的相关软件都较新，所以这里推荐操作系统方面也尽可能使用较新的稳定版本。
-##1、安装以太坊客户端
-	sudo add-apt-repository -y ppa:ethereum/ethereum
-	sudo apt-get update
-	sudo apt-get install -y ethereum
-	geth version
-##2、建立目录和 genesis.json 文件
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在命令行模式新建一个目录，例如 .ethereum，进入该目录并创建文件 genesis.json，并填入如下内容。
-	
-	{
-	  "nonce": "0x0000000000000042",
-	  "timestamp": "0x0",
-	  "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-	  "extraData": "0x00",
-	  "gasLimit": "0x80000000",
-	  "difficulty": "0x1",
-	  "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-	  "coinbase": "0x3333333333333333333333333333333333333333",
-	  "alloc": {     },
-	  "config": {     }
-	}
-
-##3、执行命令，创建创世区块
-	geth --datadir "./" init genesis.json
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这时应注意一下，当前目录下会新增出两个文件夹 geth 和 keystore。
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geth 中保存的是区块链的相关数据。
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keystore 中保存的是该链条中的用户信息。
-##4、创建自己的私有链条
-	geth --datadir "./" console 2>>geth.log
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注意：>> 的前后不能有空格。<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;命令成功执行后应如下图所示：
-
-![创建私有链条][create-private-chain]
-
-##5、在自己的私链上创建用户
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输入命令 eth.accounts，会发现返回值为 []，这是因为此时虽然已经创建了以太坊私链，但还没有任何账户。
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输入命令 personal.newAccount("xxx")，该命令将创建一个新的用户，该用户的密码是 xxx，其之后在以太坊钱包中的名称将按顺序显示为 account 1, account 2 等，用户也可以将 xxx，改为 123 或者 123456，或者任意密码。
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;再次输入命令 eth.accounts，会发现一个新的用户被创建了出来，重复 personal.newAccount() & eth.accounts 可以创建若干账户出来。
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;命令成功执行的情况如下图所示：
-
-![在私链上创建用户][create-user-on-private-net]
-
-##6、打印区块链日志
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;重新打开一个命令行，执行：
+##1、进入 Geth 控制台
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在前一篇中我们提到，可以用下面的命令来建立一个新的私有链，现在来对其做一些解释：<br/>
 
 ```
-cd .ethereum/ & tail -Fn 500 geth.log
+geth --datadir "./" --nodiscover console 2>>geth.log
 ```
-##7、开始挖矿
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;回到之前的命令行窗口，执行命令 ```miner.start(1)```
-![开发挖矿][begin-mine]
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;稍等片刻后便会开始挖矿，一些成功挖矿的日志如下：
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;–-datadir 代表文件夹地址<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;–-nodiscover 代表该链条不希望被其他节点发现<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console 代表进入 geth 控制台，当然从控制台退出也很简单，只要打入 exit 即可<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2>>geth.log 表示将相关日志输出到文件 geth.log 中去<br/>
+##2、Geth命令行中的 eth.accounts
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;该命令可以查看到当前区块链中共有哪些账号，以及每个账号的公钥地址。每一个以太坊账户都有一对公钥和私钥组成，从私钥到公钥采用单向加密算法。
+##3、新增账户
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们可以使用 ```personal.newAccount("123")```来新建一个账户，其中 123 是账户的密码，账户在钱包中默认是以 Account 1、Account 2 等形式显示，用户可以在钱包中随意修改，因为以太坊并不是以该名称来唯一确定一个用户的，而是使用公钥地址。
+##4、在两个账户之间转移以太币
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;前面说过，Geth 是一个以太坊客户端，虽然它也能创建新的以太坊网络，因此它具备在账户之前转移以太币的能力。但由于账户地址字符串太长，我们可以设置一个变量 acc0/acc1 分别代表 accounts[0] 及 accounts[1]，另外设置要转移 0.01个以太币
 
-![一些挖矿日志][has-mined]
+```
+> acc0 = eth.accounts[0]
+"0x177362b669fba1b7aebdb918c891f658eb3f4c84"
+> acc1 = eth.accounts[1]
+"0x7cb3d9d8c306fc8fe4d1f2f01b08f44a704e177f"
+> amount = web3.toWei(0.01)
+"10000000000000000"
+```
 
-##注意点
-1. 挖矿挖到的 ether币会默认保在第一个账户中，即 eth.acccounts[0] 中。
-2. 挖矿是执行智能合约的基础。如果停止挖矿，不仅以太币会停止生成，所有智能合约的调用也会不起作用。
-3. 如果真的要停止，可以执行命令 miner.stop() 来停止挖矿
-4. 按上面的命令，应该是可以实现以太坊挖矿的。如果不行的话，可能是之前有存在的链，此时可删除之前的数据。在 Linux 下即删除 ~/.ethash 文件夹和里面的文件即可。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;接下来我们可以使用 ```eth.sendTransaction```来将 0.01 个以太币从 acc0 转移到 acc1 中。
+> eth.sendTransaction({from: acc0, to: acc1, value: amount})
 
-##8、查看主账户以太币数量
-	acc0 = eth.accounts[0]
-	eth.getBalance(acc0)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结果只要不为 0，就说明挖矿成功。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此时会出现下面的错误
+
+![交易失败][transaction-fail]
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这是以太坊的一个保护机制，每隔一段时间账户会被自动锁定，这个时候的账户只能入不能出，除非把该账户解锁
+
+```
+> personal.unlockAccount(acc0)
+Unlock account 0x177362b669fba1b7aebdb918c891f658eb3f4c84
+Passphrase: 
+true
+>
+
+```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;之后再次执行命令 ```eth.sendTransaction({from: acc0, to: acc1, value: amount})```，结果如下
+
+```
+> eth.sendTransaction({from: acc0, to: acc1, value: amount})
+"0x7cb3d9d8c306fc8fe4d1f2f01b08f44a704e177f"
+> eth.getBalance(acc1)
+10000000000000000
+>
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以看到这时账户 acc1 有数值10000000000000000了，其等于 0.01 ether 币，可以使用命令 ```web3.fromWei(10000000000000000,"ether")```进行换算
+
+```
+> web3.fromWei(10000000000000000,"ether")
+"0.01"
+```
+
+##5、Ether币的基本单位
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ether币的最小单位是 Wei，也是命令行默认的单位，每 1000 进一个单位，依次是：
+<pre>
+kwei (1000 Wei)
+mwei (1000 KWei)
+gwei (1000 mwei)
+szabo (1000 gwei)
+finney (1000 szabo)
+ether (1000 finney)
+</pre>
+##6、开始挖矿 & 停止挖矿
+```
+> miner.start() //开始挖矿
+true
+> miner.stop() //停止挖矿
+true
+>
+```
+##7、部署合约
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;部署合约需要消耗 gas，所以也需要对账户进行解锁，否则不会允许以太币流出，解锁后，将 remix-ide 中合约的编译结果“DEPLOY”的内容直接贴入命令行即可，这部分内容在下一篇中会讲到，这里先部署一个笔者已经编译好的合约，其原码为：
+
+```
+pragma solidity ^0.4.23;
+contract DemoTypes {
+    function f(uint a) public pure returns (uint b) {
+        uint result = a * 8;
+        return result;
+    }
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编译后的 deploy 内容为：
+
+```
+var demotypesContract = web3.eth.contract([{"constant":true,"inputs":[{"name":"a","type":"uint256"}],"name":"f","outputs":[{"name":"b","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"}]);
+var demotypes = demotypesContract.new(
+   {
+     from: web3.eth.accounts[0], 
+     data: '0x608060405234801561001057600080fd5b5060c08061001f6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063b3de648b146044575b600080fd5b348015604f57600080fd5b50606c600480360381019080803590602001909291905050506082565b6040518082815260200191505060405180910390f35b600080600883029050809150509190505600a165627a7a723058207c086fca68eaa0dc5e7ef06ff12187e9d98d193078b802ff524ac430417037d70029', 
+     gas: '4700000'
+   }, function (e, contract){
+    console.log(e, contract);
+    if (typeof contract.address !== 'undefined') {
+         console.log('Contract mined! address: ' + contract.address + ' transactionHash: ' + contract.transactionHash);
+    }
+ })
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;进行部署
+
+![命令行部署合约][deploy-contract]
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;等待片刻，合约就被部署到挖矿挖出的区块中了, 按下回车代表成功。此时输入合约部署的实例 demotypes, 可以看到demotypes 的详情。
+
+![查看合约详情][demotypes]
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;之后就可以使用合约名和函数名调用智能合约。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+[transaction-fail]:
+[deploy-contract]:
+[demotypes]:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
