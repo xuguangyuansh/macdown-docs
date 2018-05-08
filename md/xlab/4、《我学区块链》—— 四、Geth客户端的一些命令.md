@@ -13,7 +13,7 @@ geth --datadir "./" --nodiscover console 2>>geth.log
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在实际工作中，如果 Geth 节点与 wallet 客户端不在同一台机器，则需要通过网络才能看到节点的挖矿情况，和执行以太币转移。且因为 Geth 在挖矿时消耗较多的资源，因此在实际工作中，在调试合约时一种是使用本地节点仿真器，其比较快，不用等待较长时间的挖矿。第二种是将 geth 部署在内网的服务器上，供大家一起使用，这种情况下需要开启 geth 的 rpc 功能，且开放相关的接口，一条可能的命令也许会是如下的样子
 
 ```
-geth --rpc --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "db,net,eth,web3,personal" --port "30303" --targetgaslimit 4294967295 --networkid 2018 --identity 2018 --nodiscover --maxpeers 5 --datadir "./" --unlock 0 --rpccorsdomain "*" --mine --minerthreads=1 console 2>>geth.log
+geth --rpc --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "db,net,eth,web3,personal,admin,debug,miner,shh,txpool" --port "30303" --targetgaslimit 4294967295 --networkid 2018 --identity 2018 --nodiscover --maxpeers 5 --datadir "./" --unlock 0 --rpccorsdomain "*" --mine --minerthreads=1 console 2>>geth.log
 ```
 
 对其中的参数做一些解释：
