@@ -9,11 +9,38 @@ geth --datadir "./" --nodiscover console 2>>geth.log
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;–-nodiscover 代表该链条不希望被其他节点发现<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console 代表进入 geth 控制台，当然从控制台退出也很简单，只要打入 exit 即可<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2>>geth.log 表示将相关日志输出到文件 geth.log 中去<br/>
-##2、Geth命令行中的 eth.accounts
+##2、Geth http调用
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在实际工作中，如果 Geth 节点与 wallet 客户端不在同一台机器，则需要通过网络才能看到节点的挖矿情况，和执行以太币转移。且因为 Geth 在挖矿时消耗较多的资源，因此在实际工作中，在调试合约时一种是使用本地节点仿真器，其比较快，不用等待较长时间的挖矿。第二种是将 geth 部署在内网的服务器上，供大家一起使用，这种情况下需要开启 geth 的 rpc 功能，且开放相关的接口，一条可能的命令也许会是如下的样子
+
+```
+geth --rpc --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "db,net,eth,web3,personal" --port "30303" --targetgaslimit 4294967295 --networkid 2018 --identity 2018 --nodiscover --maxpeers 5 --datadir "./" --unlock 0 --rpccorsdomain "*" --mine --minerthreads=1 console 2>>geth.log
+```
+
+对其中的参数做一些解释：
+<pre>
+--rpc 				# 激活 geth 的 rpc 功能；
+--rpcaddr 			# 需要 rpc 监听的地址，“0.0.0.0” 为不限制；
+--rpcport 			# rpc 服务的端口；
+--rpcapi 			# rpc 开放调用的接口；
+--port 				# geth 服务端口，用于节点间建立联系；
+--targetgaslimit	# 每个区块能承载的 gas 上限，可以暂时理解为容量；
+--networkid 		# 指定一个网络 ID，用于寻找加入，或声明新的；
+--identity			# 当前节点的标识
+--nodiscover		# 不允许被发现，需要手动加入新节点；
+--maxpeers			# 允许访问的连接数；
+--datadir			# geth 的工作目录
+--unlock			# 解锁 账户
+--rpccorsdomain		# rpc 服务限制的域名，"*" 为不限制；
+--mine				# 开启挖矿；
+--minerthreads		# 挖矿启动的线程数；
+console				# 进入 geth 控制台；
+</pre>
+
+##3、Geth命令行中的 eth.accounts
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;该命令可以查看到当前区块链中共有哪些账号，以及每个账号的公钥地址。每一个以太坊账户都有一对公钥和私钥组成，从私钥到公钥采用单向加密算法。
-##3、新增账户
+##4、新增账户
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们可以使用 ```personal.newAccount("123")```来新建一个账户，其中 123 是账户的密码，账户在钱包中默认是以 Account 1、Account 2 等形式显示，用户可以在钱包中随意修改，因为以太坊并不是以该名称来唯一确定一个用户的，而是使用公钥地址。
-##4、在两个账户之间转移以太币
+##5、在两个账户之间转移以太币
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;前面说过，Geth 是一个以太坊客户端，虽然它也能创建新的以太坊网络，因此它具备在账户之前转移以太币的能力。但由于账户地址字符串太长，我们可以设置一个变量 acc0/acc1 分别代表 accounts[0] 及 accounts[1]，另外设置要转移 0.01个以太币
 
 ```
@@ -59,7 +86,7 @@ true
 "0.01"
 ```
 
-##5、Ether币的基本单位
+##6、Ether币的基本单位
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ether币的最小单位是 Wei，也是命令行默认的单位，每 1000 进一个单位，依次是：
 <pre>
 kwei (1000 Wei)
@@ -69,7 +96,7 @@ szabo (1000 gwei)
 finney (1000 szabo)
 ether (1000 finney)
 </pre>
-##6、开始挖矿 & 停止挖矿
+##7、开始挖矿 & 停止挖矿
 ```
 > miner.start() //开始挖矿
 true
@@ -77,7 +104,7 @@ true
 true
 >
 ```
-##7、部署合约
+##8、部署合约
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;部署合约需要消耗 gas，所以也需要对账户进行解锁，否则不会允许以太币流出，解锁后，将 remix-ide 中合约的编译结果“DEPLOY”的内容直接贴入命令行即可，这部分内容在下一篇中会讲到，这里先部署一个笔者已经编译好的合约，其原码为：
 
 ```
