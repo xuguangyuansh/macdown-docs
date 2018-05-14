@@ -51,7 +51,7 @@ contract Token {
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;选择要执行的合约方法，这里执行 mint，相当于对本代币进行了挖矿。
 
-![执行合约方法][run-contract-mint]
+<center>![执行合约方法][run-contract-mint]
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点击 execute 后，会提示输入调用该合约方法的账户密码。
 
