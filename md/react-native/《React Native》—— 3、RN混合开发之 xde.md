@@ -33,7 +33,7 @@
 <center>![xde-iphone][]</center>
 
 ## 编辑项目
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用 WebStorm 打开刚刚创建的 rn 混合项目 myxde，并在其中的 App.js 中编写 react 代码，这次 iphone 模拟器中又可以自动更新渲染了。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用 WebStorm 打开刚刚创建的 rn 混合项目 myxde，并在其中的 App.js 中编写 react 代码，这次 iphone 模拟器中又可以自动更新渲染了。不过它也有一个问题，当你编写了错误的代码，比如会导致编译时异常的，当 xde 编译异常发生后，无论是否再修改回正确状态，xde 的自动加载渲染都不会再启作用，而需要重启 iphone 模拟器。
 
 ## 移动 Iphone 窗口
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;与 crna 时一样，Iphone x 窗口移动时经常失败，可点住尽量靠近边缘位置，能提升一些成功率。
