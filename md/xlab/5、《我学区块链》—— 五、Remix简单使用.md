@@ -1,6 +1,6 @@
-#五、Remix简单使用
+# 五、Remix简单使用
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;目前以太坊智能合约的编辑器主要有在线的 http://remix.ethereum.org；由 remix-ide自己搭建的；以及 Mac，Linux 系统上的 Remix-app 三种。三者的使用方式一致，这里以 Mac 平台的 Remix-app 为例。
-##1、使用 Remix-app 来编译合约
+## 1、使用 Remix-app 来编译合约
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;打开安装的 remix-app，在左侧填入以下代码，代码功能很简单，不做过多解释，只是将输入的数字乘以 8，再返回。
 
 ```
@@ -61,7 +61,7 @@ function f(uint a) public pure returns (uint b) {
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;前面说过，合约中包含方法和变量，```function f(uint a) public pure returns (uint b)```代表定义了一个名为 f 的方法，输入变量为 uint a，输出为 uint b。
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uint 代表无状态整形数字，即大于 0 的整数。
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uint 默认为 uint256，即最大值为 2 的 256次方，这个数字对于绝大多数的数学去处已经足够了。同理还有 uint8 等。
-##4、Remix-ide本地部署
+## 4、Remix-ide本地部署
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;由于一些原因，可能还是需要使用在线编译器，而 http://remix.ethereum.org 的服务器在国外，速度较慢。因此，接下来还是补充一下 remix-ide 的本地部署相关内容，可以选择部署在内网服务器上，这样内网人员就可以一起用了。<br/>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首先需要安装 nodejs 及 npm，且 node 版本需要 > 4.6 & < 9
 
@@ -92,7 +92,7 @@ npm start
 
 ![本地remix-ide][local-remix-ide]
 
-##5、最佳实践
+## 5、最佳实践
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首行说明，这里所说的最佳实践是笔者认为的一种比较高效快捷的开发经验，不代表行业共识，只作参考。<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在笔者的体验中，remix-ide 不能很好的支持左侧的目录结构，而实际的合约项目可能不仅包含 Solidity 合约代码，也会包含一些工具类，像 Lib，因此 remix-ide 不方便进行一些多合约的开发。而另外的 remix-app，虽已是一款本地 app，但其与本地文件系统的结合仍然不好，笔者的亲身经历是没能够打开本地合约工程项目。<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在真实的合约项目开发中，一般都会用到一款框架 Truffle，该框架本身可以通过脚本化的方式，支持合约的编译、测试、部署，而且其 Solidity 编译版本也是紧跟 Solidity 官方发布版本，十分方便。因此，这里笔者给出一种还算方便快捷的开发实践：笔者选择的 IDE 是 WebStorm，在其插件仓库中搜索 solidity，会发现有两款插件，这里对这两款插件作一些解释：
@@ -124,7 +124,7 @@ event votedEvent(uint indexed_candidateId);
 emit votedEvent(_candidateId);
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所以，这里我们只安装 Intellij-Solidity 插件，来进行代码高亮，而不使用插件的语法检查。这样，用来开发智能合约项目已经十分方便了，而且可以继续使用 JetBrains 家族 IDE 的大量快捷键，实现手不离键盘开发。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所以，这里我们只安装 Intellij-Solidity 插件，来进行代码高亮，不使用插件的语法检查，语法错误由 truffle 在编译阶段进行提示。这样，用来开发智能合约项目已经十分方便了，而且可以继续使用 JetBrains 家族 IDE 的大量快捷键，实现手不离键盘开发。
 
 ![WebStorm编写代码][webstorm-code]
 
