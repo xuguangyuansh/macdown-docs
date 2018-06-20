@@ -1,12 +1,12 @@
-# 十一、合约安全之 DAO 漏洞分析
+# 十二、合约安全之 Parity 第一次漏洞分析
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首先，再罗嗦几句 DAO 是什么，DAO 本质上是一个风险投资基金，是一个基于以太坊区块链平台的迄今为止世界上最大的众筹项目。可理解为完全由计算机代码控制运作的类似公司的实体，通过以太坊筹集到的资金会锁定在智能合约中，每个参与众筹的人按照出资数额，获得相应的DAO代币(token)，具有审查项目和投票表决的权利。投资议案由全体代币持有人投票表决，每个代币一票。如果议案得到需要的票数支持，相应的款项会划给该投资项目。投资项目的收益会按照一定规则回馈众筹参与人。<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;截止目前，Parity 多重签名钱包共发生过两次安全事件，第一次发生在 2017年07月19日，涉及 Parity 1.5 及以上的版，造成 15万以太币约 3000万美元被盗，第二次发生在 2017年11月07日，致使约 50万枚以太币被锁在合约中无法取出，当时价值大约 1.5亿美元，本篇先对发生于 7月19日的第一次安全漏洞做一下分析，下一篇再分析 2017年11月7日的安全漏洞。
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DAO 于2016年5月28日完成众筹，共募集1150万以太币，在当时的价值达到1.49亿美元。而 DAO 事件就是黑客利用合约中一段不严谨的编码，通过参数攻击，使一个方法的前半部分已经转移了代币，但在方法最后更新客户余额并结束前再次从头部执行本方法，进而不断的将代币转移到黑客的地址。
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;下面结合代码来分析一下 DAO 事件涉及的漏洞，文章部分引用了 [Analysis of the DAO exploit](http://hackingdistributed.com/2016/06/18/analysis-of-the-dao-exploit/) 及 [The DAO 事件，区块链征途上的一场暴风雨](https://www.jianshu.com/p/431cddaea961) 的内容。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;完整代码在 [Slockit/DAO](https://github.com/slockit/DAO/blob/1.0.1/DAO.sol)，即 github slockit/DAO 代码的 tag v1.0.1。或 [xugy/DAO-1.0.1](https://gitee.com/xugy/DAO-1.0.1/blob/master/DAO.sol) 。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;完整代码在 [Slockit/DAO](https://github.com/slockit/DAO/blob/1.0.1/DAO.sol)，即 github slockit/DAO 代码的 tag v1.0.1。
 
 ## 先热个身
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;要想搞明白本次事件的漏洞原理，需要先掌握一个 Solidity 的编程技巧，很多人不明白为什么会进入递归，问题也正在于此。<br/>
