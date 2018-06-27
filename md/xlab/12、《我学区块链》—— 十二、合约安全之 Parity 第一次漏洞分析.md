@@ -95,16 +95,51 @@ modifier onlyowner {
 ```
 
 ## 解决方案：
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过上面的分析可以看到，核心问题在于越权的函数调用，Parity钱包合约接口必须精心设计和明确定义访问权限，或者更进一步说，Parity钱包的合约的设计必须符合某种成熟的模式，或者标准，Parity钱包合约代码部署前最好交由专业的机构进行评审。否则，一个不起眼的代码就会让你丢掉所有的钱。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过上面的分析可以看到，核心问题在于越权的函数调用，那修复方法便是对`initWallet`及与之相关的接口方法`initDaylimit`和`initMultiowned`重新定义访问权限：
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+```js
+// throw unless the contract is not yet initialized.
+modifier only_uninitialized {
+    if (m_numOwners > 0) throw; 
+        _;
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过检查`m_numOwners`变量值，若已经初始化，则直接返回(旧版 solidity 中是抛出异常)，不允许再执行`initWallet`等方法：
+
+```js
+// constructor - stores initial daily limit and records the present day's index.
+function initDaylimit(uint _limit) only_uninitialized {
+    m_dailyLimit = _limit;
+    m_lastDay = today();
+}
+```
+
+```js
+// constructor - just pass on the owner array to the multiowned and
+// the limit to daylimit
+function initWallet(address[] _owners, uint _required, uint _daylimit) only_uninitialized {
+    initDaylimit(_daylimit);
+    initMultiowned(_owners, _required);
+}
+```
+
+```js
+// constructor is given number of sigs required to do protected "onlymanyowners" transactions
+// as well as the selection of addresses capable of confirming them.
+function initMultiowned(address[] _owners, uint _required) only_uninitialized {
+    m_numOwners = _owners.length + 1;
+    m_owners[1] = uint(msg.sender);
+    m_ownerIndex[uint(msg.sender)] = 1;
+    for (uint i = 0; i < _owners.length; ++i) {
+        m_owners[2 + i] = uint(_owners[i]);
+        m_ownerIndex[uint(_owners[i])] = 2 + i;
+    }
+    m_required = _required;
+}
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可注意到，每个函数第一行的最后面都添加了限定修改器标识`only_uninitialized`，这就是 Parity 多重签名钱包，第一次安全事件的漏洞原理和解决办法，该漏洞发生于 2017年07月19日，致使大约 3000万美元资产被盗。下一篇我们分析 Parity 的第二次安全事件。
 
 
 
