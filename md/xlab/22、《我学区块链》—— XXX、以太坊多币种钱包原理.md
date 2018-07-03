@@ -19,7 +19,7 @@ var rawTx = {
 }
 ```
 
-- `nonce`：为防止交易重播，ETH（ETC）节点要求每笔交易必须有一个 nonce 数值。每一个账户从同一个节点发起交易时，这个 nonce 值从0开始计数，发送一笔 nonce 对应加 1。当前面的 nonce 处理完成之后才会处理后面的 nonce。可调用 RPC `eth_getTransactionCount` 来获取。 <br/>
+- `nonce`：为防止交易重播，ETH（ETC）节点要求每笔交易必须有一个 nonce 数值。每一个账户从同一个节点发起交易时，这个 nonce 值从0开始计数，发送一笔交易 nonce 对应加 1，直接填写较大的会等待它前面的数的交易完成才能交易。使用与自己发送的处于 pending 状态的交易相同的 nonce，则会取消掉前一笔交易，所以一般钱包发给同一个人的前一笔交易被拥堵可以发送一个 0eth 的交易取消前面交易。可调用 RPC `eth_getTransactionCount` 来获取。 <br/>
 - `gasPrice`：gas 对 以太币价格，可以调用 RPC `eth_gasPrice` 来查询<br/>
 - `gasLimit`：提供的手续费<br/>
 - `to`：接收以太币地址<br/>
@@ -77,8 +77,7 @@ $http.post(this.SERVERURL, JSON.stringify(data), this.config).then(function (dat
 });
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里 `$http.post` 为 Angular $HttpProvider 写法，小伙伴可自行将其改换为其他 ajax 请求。
-
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里 `$http.post` 为 `Angular $HttpProvider` 写法，小伙伴可自行将其改换为其他 ajax 请求。
 
 ## 3、代币交易
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;代币交易需要将数据封装成下面的格式，0x 开头的皆为 16进制形式：
@@ -112,7 +111,7 @@ var rawTx = {
 function transfer(address _to, uint _value) public returns (bool);
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提炼出函数原型
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;提炼出函数原型，注意不能包含空格：
 
 ```
 transfer(address,uint256)

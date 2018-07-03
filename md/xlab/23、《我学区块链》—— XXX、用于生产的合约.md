@@ -13,8 +13,16 @@
 
 ```js
 function destroy() {
-	if (msg.sender == owner) {
-		suicide(owner)
+	if (owner == msg.sender) {
+		selfdestruct(owner);	// destroy the current contract, sending its funds to the given Address
+	}
+}
+```
+
+```js
+function destroy() {
+	if (owner == msg.sender) {
+		suicide(owner);	// deprecated alias to selfdestruct
 	}
 }
 ```
