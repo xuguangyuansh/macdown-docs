@@ -1,0 +1,78 @@
+# 容器与容器云 — x、Mac 下 Docker 安装
+
+## 1、使用 Docker.dmg 安装
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;下载并运行 docker.dmg：
+[https://download.docker.com/mac/stable/Docker.dmg](https://download.docker.com/mac/stable/Docker.dmg)。<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这种安装方式虽然简单，且可通过迅雷进行下载以快速部署，但 Mac 主机却无法 ping 通容器实例，因为 docker 原生只适用于 Linux，其余所有系统，匀是先在主机上虚拟一台 linux，再在该虚拟机中安装 docker。而使用 docker.dmg 部署时由于其不会为 Mac 主机创建虚拟网卡，因此 Mac 到这台虚拟的 linux 系统的网络是不通的，进而无法通过网络访问容器的服务，但仍然可以通过端口映射来访问，不过有些服务必须要和客户端处于不同网络，这种情况下就不得不使用 Homebrew + virtualbox 的方式来部署 docker。
+
+## 2、使用 Homebrew 安装
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1）安装 Homebrew
+
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2）安装 VirtualBox
+[https://download.virtualbox.org/virtualbox/5.2.14/VirtualBox-5.2.14-123301-OSX.dmg
+](https://download.virtualbox.org/virtualbox/5.2.14/VirtualBox-5.2.14-123301-OSX.dmg
+)。
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3）安装 docker、docker-machine
+
+```
+brew install docker boot2docker docker-machine docker-compose
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4）创建默认 linux
+
+```
+docker-machine create --driver virtualbox default
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5）进入 linux docker 环境
+
+```
+docker-machine ssh default
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;之后就可以进入 docker 操作了，如 docker pull ...，docker ps -a 等，而且该 linux 环境还可以通过 virtualbox 虚拟网卡与主机通信。
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此外，还要以安装 kitematic，这是 docker 推出的 GUI 工具，使操作 docker 的方式变得更简单直观。
+
+## 3、docker-machine 常用命令
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看当前的machine：```docker-machine ls```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;创建一个docker-machine：<br/>
+```docker-machine create --driver virtualbox default```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;更改环境变量，使得本地 docker 指向docker-machine，需要执行命令：<br/>
+```eval "$(docker-machine env default)"```
+
+- `help` 查看帮助信息
+- `active` 查看活动的Docker主机
+- `config` 输出连接的配置信息
+- `create` 创建一个Docker主机
+- `env` 显示连接到某个主机需要的环境变量
+- `inspect` 输出主机更新信息
+- `ip` 获取Docker主机地址
+- `kill` 停止某个Docker主机
+- `ls` 列出所有管理的Docker主机
+- `regenerate-certs` 为某个主机重新成功TLS认证信息
+- `restart` 重启Docker主机
+- `rm` 删除Docker主机
+- `scp` 在Docker主机之间复制文件
+- `ssh` SSH到主机上执行命令
+- `start` 启动一个主机
+- `status` 查看一个主机状态
+- `stop` 停止一个主机
+- `upgrade` 更新主机Docker版本为最新
+- `url` 获取主机的URL
+
+参考资料：https://www.jianshu.com/p/5d3f6b40b132
+
+
+
+
+
+
+
