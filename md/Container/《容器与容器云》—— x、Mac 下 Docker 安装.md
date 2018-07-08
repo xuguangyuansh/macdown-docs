@@ -39,7 +39,13 @@ docker-machine ssh default
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此外，还要以安装 kitematic，这是 docker 推出的 GUI 工具，使操作 docker 的方式变得更简单直观。
 
-## 3、docker-machine 常用命令
+## 3、Mac ping 通 docker 容器
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过 virtualbox 安装的容器主机，是可以通过 virtualbox 的虚拟网卡和 Mac 主机通信的，但容器主机内的容器实例仍是无法与 Mac 主机通信的。处理方法如下：假设 virtualbox 容器主机的 ip 为 192.168.99.100，容器主机内的容器实例 ip 段为 172.17.0.0/16，则需要为系统添加一条路由，即告诉系统所有到 172.17.0.0/16 的数据，都从 192.168.99.100 这个网卡发出去，mac 下 `sudo route -n add -net 172.17.0.0/16 192.168.99.100`，这样 Mac 主机就可以 ping 通位于虚拟容器主机内处于 172.17.0.0/16 网段的容器实例了。
+
+参考资料：https://blog.csdn.net/Mr0o0rM/article/details/80683115
+
+
+## 4、docker-machine 常用命令
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看当前的machine：```docker-machine ls```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;创建一个docker-machine：<br/>
