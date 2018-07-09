@@ -82,6 +82,8 @@ launchctl load com.docker.machine.default.plist
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;至此，docker-machine default 已可以随 Mac 系统登录而启动。
 
+注：boot2docker 虚拟主机的默认用户/密码：docker/tcuser
+
 参考资料：<br/>
 https://gist.github.com/andystanton/257fab335b242bc2658b
 https://stackoverflow.com/questions/39226654/start-docker-machine-on-boot
