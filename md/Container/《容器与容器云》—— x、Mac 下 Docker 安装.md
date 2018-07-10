@@ -37,6 +37,58 @@ docker-machine ssh default
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;之后就可以进入 docker 操作了，如 docker pull ...，docker ps -a 等，而且该 linux 环境还可以通过 virtualbox 虚拟网卡与主机通信。
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6）若要直接从宿主机发起 docker 命令，需要编辑 ~/.zshrc 或 ~/.bashrc 文件，在末尾添加 `eval "$(docker-machine env default)"`
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7）开机启动虚拟容器主机：
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在用户目录 ~/ 创建 `com.docker.machine.default.plist` 文件。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>EnvironmentVariables</key>
+        <dict>
+            <key>PATH</key>
+            <string>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin</string>
+        </dict>
+        <key>Label</key>
+        <string>com.docker.machine.default</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/usr/local/bin/docker-machine</string>
+            <string>start</string>
+            <string>default</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+    </dict>
+</plist>
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;之后将其拷贝到`/Library/LaunchAgents`目录，并附 755 权限，并使用`launchctl load`进行加载。
+
+```
+cp com.docker.machine.default.plist /Library/LaunchAgents/
+cd /Library/LaunchAgents/
+sudo chmod 755 com.docker.machine.default.plist
+launchctl load com.docker.machine.default.plist
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;每次修改 plist 文件，匀需重新 `launchctl unload && launchctl load`。
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;load 以后，可使用`launchctl list | grep docker`来查看是否成功。
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;至此，docker-machine default 已可以随 Mac 系统登录而启动。
+
+注：boot2docker 虚拟主机的默认用户/密码：docker/tcuser
+
+参考资料：<br/>
+https://gist.github.com/andystanton/257fab335b242bc2658b
+https://stackoverflow.com/questions/39226654/start-docker-machine-on-boot
+https://andy.stanton.is/writing/about/running-a-local-docker-machine-at-startup-on-osx/
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此外，还要以安装 kitematic，这是 docker 推出的 GUI 工具，使操作 docker 的方式变得更简单直观。
 
 ## 3、Mac ping 通 docker 容器
