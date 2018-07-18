@@ -1,4 +1,4 @@
-# 十三、合约安全之 Parity 第二次漏洞分析
+# 十三、合约安全之 Parity 第二次安全事件漏洞分析
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Parity 多签钱包的第二次漏洞发生于 2017年11月07日，不同于 17年7月19日那次，本次不是资产被黑客盗走，而是合约底层被破坏，导致资产就在那，但却永远也取不出，就像驾船到太平洋最深处，投下一枚硬币，硬币就在那，但你可能再也无法找到它。
 
@@ -61,7 +61,7 @@ modifier only_uninitialized { if (m_numOwners > 0) throw; _; }
 
 
 ## 修复方法
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;显然`only_uninitialized`的限制仍是不严谨的，而若想不发生本次的安全事件，可对进一步对`initWallet`、`initDaylimit`及`initMultiowned`添加`internal`限定类型，以禁止外部调用：
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;显然`only_uninitialized`的限制仍是不严谨的，而若想不发生本次的安全事件，可进一步对`initWallet`、`initDaylimit`及`initMultiowned`添加`internal`限定类型，以禁止外部调用：
 
 ```js
 // constructor - just pass on the owner array to the multiowned and
